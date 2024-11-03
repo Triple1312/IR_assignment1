@@ -41,6 +41,15 @@ class Document {
     load();
   }
 
+  int size() {
+    if (contents == "") {
+      return file!.lengthSync();
+    }
+    else {
+      return _contents.length;
+    }
+  }
+
   set contents(String _contents) {
     file!.writeAsStringSync(_contents);
   }

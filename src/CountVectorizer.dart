@@ -15,24 +15,6 @@ class Countvectorizer extends Vectorizer {
 
   @override
   Matrix<num> transform(List<String> documents) {
-    // // Precompute the indices in a map for quick lookup.
-    // Map<String, int> vocabIndices = {};
-    // for (int i = 0; i < vocab.length; i++) {
-    //   vocabIndices[vocab[i]] = i;
-    // }
-    //
-    // return documents.map((document) {
-    //   List<String> words = document.toLowerCase().split(" ");
-    //   List<double> counts = List<double>.filled(vocab.length, 0.0);
-    //
-    //   words.forEach((word) {
-    //     if (vocabIndices.containsKey(word)) {
-    //       counts[vocabIndices[word]!]++;
-    //     }
-    //   });
-    //
-    //   return counts;
-    // }).toList();
     return new Matrix<num>.empty();
   }
 
@@ -119,31 +101,5 @@ class Countvectorizer extends Vectorizer {
     this.data = Matrix<num>.csr(values: docmatrix);
     return data;
   }
-
-  // List<List<int>> fit_transform_int(List<String> documents, {bool sorted = false}) {
-  //   fit(documents, sorted: sorted);
-  //   return transform_int(documents);
-  // }
-  //
-  // List<List<int>> transform_int(List<String> documents) {
-  //   // Precompute the indices in a map for quick lookup.
-  //   Map<String, int> vocabIndices = {};
-  //   for (int i = 0; i < vocab.length; i++) {
-  //     vocabIndices[vocab[i]] = i;
-  //   }
-  //
-  //   return documents.map((document) {
-  //     List<String> words = document.toLowerCase().split(" ");
-  //     List<int> counts = List<int>.filled(vocab.length, 0);
-  //
-  //     words.forEach((word) {
-  //       if (vocabIndices.containsKey(word)) {
-  //         counts[vocabIndices[word]!]++;
-  //       }
-  //     });
-  //
-  //     return counts;
-  //   }).toList();
-  // }
 
 }

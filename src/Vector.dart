@@ -1,6 +1,7 @@
 
 import 'dart:math';
 
+
 import 'Tensor.dart';
 
 
@@ -124,6 +125,10 @@ class Vector<T extends num> implements Tensor<T> , List<T> {
   @override
   num norm(int p) {
     return pow(this.fold(0, (a,b) => a+ pow(b.abs(),p)), 1/p);
+  }
+
+  num norm2() {
+    return sqrt(flat.fold(0, (a, b) => a + b*b));
   }
 
 
@@ -431,6 +436,8 @@ class SparceVector<T extends num> extends Vector<T> {
     }
   }
 
+  SparceSparceVectorIterable<T> get sparceIterator => new SparceSparceVectorIterable(this);
+
   SparceVector.sparce(List<T> values, this._indices, this.length) : super(values);
 
 
@@ -480,8 +487,68 @@ class SparceVector<T extends num> extends Vector<T> {
     this[index] = value;
   }
 
+  num norm2() {
+    num ret = 0;
+    for (int i = 0; i < _base.length; i++) {
+      T tmp = _base[i];
+      ret += tmp*tmp;
+    }
+    return sqrt(ret);
+  }
 }
 
+
+class MapVector<T extends num> extends Vector<T> {
+  Map<int, T> data;
+
+  int length;
+
+  MapVector() : data = {}, length = 0, super.empty();
+
+  MapVector.map(this.data, this.length) : super.empty();
+
+  num dot(Vector<num> v) {
+    num sum = 0;
+    for (var x in data.keys) {
+      sum += v[x] * data[x]!;
+    }
+    return sum;
+  }
+  num norm(int p) {
+    num ret = 0;
+    for (var x in data.keys) {
+      ret += pow(data[x]!.abs(), p);
+    }
+    return pow(ret, 1/p);
+  }
+
+  num norm2() {
+    num ret = 0;
+    for (var x in data.keys) {
+      T tmp = data[x]!;
+      ret += tmp*tmp;
+    }
+    return sqrt(ret);
+  }
+
+  Vector<num> operator /(num scalar) {
+    Map<int, num> new_data = {};
+    for (var x in data.keys) {
+      new_data[x] = data[x]! / scalar;
+    }
+    return MapVector<num>.map(new_data, length);
+  }
+
+  Vector<num> diveq(num scalar) {
+    data.map((key, value) => MapEntry(key, value / scalar));
+    return this;
+  }
+
+  operator [](int index) {
+    return data[index]?? 0.0 as T;
+  }
+
+}
 
 class SparceVectorIterator<T extends num> implements Iterator<T> {
 
@@ -503,4 +570,38 @@ class SparceVectorIterator<T extends num> implements Iterator<T> {
 
   @override
   get current => _vector[_currentIndex];
+}
+
+class SparceSparceVectorIterable<T extends num> extends Iterable<(int, T)> {
+
+  SparceVector<T> vector;
+
+  SparceSparceVectorIterable(this.vector);
+
+  @override
+  Iterator<(int, T)> get iterator => SparceSparceVectorIterator(vector);
+
+}
+
+
+class SparceSparceVectorIterator<T extends num> implements Iterator<(int, T)> {
+
+  SparceVector<T> _vector;
+
+  int _index = -1;
+
+  SparceSparceVectorIterator(this._vector);
+
+  @override
+  (int, T) get current => (_vector._indices[_index], _vector._base[_index]);
+
+  @override
+  bool moveNext() {
+    if (_index < _vector._indices.length - 1) {
+      _index++;
+      return true;
+    }
+    return false;
+  }
+
 }
